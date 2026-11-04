@@ -1,6 +1,12 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
+  "/robots.txt/route": "app/robots.txt/route.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
   "/about/page": "app/about/page.js",
   "/contact/page": "app/contact/page.js",
+  "/disclosure/page": "app/disclosure/page.js",
+  "/terms/page": "app/terms/page.js",
+  "/privacy/page": "app/privacy/page.js",
   "/guides/[slug]/page": "app/guides/[slug]/page.js"
 }

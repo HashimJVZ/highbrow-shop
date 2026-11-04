@@ -33,3 +33,14 @@ Open http://localhost:3000.
 ## Content editing
 
 Edit article data in `lib/content.ts`. Add full article pages under `app/guides/[slug]/page.tsx` or replace the starter template with a CMS when ready.
+
+
+## Product catalogue and admin dashboard
+
+- Public catalogue: `/products`
+- Product details: `/products/<slug>`
+- Private admin: `/admin`
+- Supabase setup: see `ADMIN-SETUP.md` and run `supabase-schema.sql` in Supabase SQL Editor.
+- Copy `.env.example` to `.env.local` and add the Supabase project URL and anon/public key. Add the same variables in Vercel before deploying.
+
+The admin uses Supabase Auth, Postgres with row-level security, and Supabase Storage. Admin access is granted using the protected `app_metadata.role = admin` claim. Never expose a service-role key in the frontend.
