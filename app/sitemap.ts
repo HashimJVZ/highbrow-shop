@@ -1,0 +1,3 @@
+import type {MetadataRoute} from 'next';
+import {articles} from '@/lib/content';
+export default function sitemap():MetadataRoute.Sitemap{const base='https://shop.highbrowdirector.in';return [{url:base,lastModified:new Date(),changeFrequency:'weekly',priority:1},{url:`${base}/about`,lastModified:new Date(),priority:.5},{url:`${base}/contact`,lastModified:new Date(),priority:.4},{url:`${base}/privacy`,lastModified:new Date(),priority:.3},{url:`${base}/disclosure`,lastModified:new Date(),priority:.5},{url:`${base}/terms`,lastModified:new Date(),priority:.3},...articles.map(a=>({url:`${base}/guides/${a.slug}`,lastModified:new Date(),changeFrequency:'monthly' as const,priority:.8}))];}

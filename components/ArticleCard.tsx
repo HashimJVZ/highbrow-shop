@@ -1,0 +1,3 @@
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
+export default function ArticleCard({article,featured=false}:{article:any;featured?:boolean}){return <Link href={`/guides/${article.slug}`} className={`article-card ${featured?'featured-card':''}`}><div className="article-image" style={{backgroundImage:`url(${article.image})`}}><span className="image-tag">{article.tag}</span></div><div className="article-copy"><div className="eyebrow">{article.category}<span>·</span>{article.read}</div><h3>{article.title}</h3><p>{article.excerpt}</p><span className="read-more">Read the guide <ArrowUpRight size={15}/></span></div></Link>}
