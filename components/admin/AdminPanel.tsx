@@ -40,7 +40,20 @@ export default function AdminPanel(){
     const {data,error} = await supabase.from('products').select('*').order('created_at',{ascending:false});
     if(error)setError(error.message); else setProducts((data||[]) as Product[]);
   }
-  const isAdmin = session?.user?.app_metadata?.role === 'admin';
+  const [isAdmin,setIsAdmin] = useState(false);
+  const [adminCheckLoading,setAdminCheckLoading] = useState(true);
+  useEffect(()=>{
+    let active = true;
+    async function checkAdmin(){
+      if(!supabase || !session?.user?.id){ if(active){setIsAdmin(false);setAdminCheckLoading(false);} return; }
+      setAdminCheckLoading(true);
+      const {data,error} = await supabase.from('admin_users').select('user_id').eq('user_id',session.user.id).maybeSingle();
+      if(active){setIsAdmin(!error && Boolean(data));setAdminCheckLoading(false);}
+    }
+    checkAdmin();
+    return ()=>{active=false;};
+  },[session]);
+
   const filtered = useMemo(()=>products.filter(p=>`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(search.toLowerCase())),[products,search]);
   async function login(e:FormEvent){e.preventDefault();setError('');if(!supabase)return;const {error}=await supabase.auth.signInWithPassword({email,password});if(error)setError(error.message);}
   async function logout(){await supabase?.auth.signOut();setProducts([]);}
@@ -68,7 +81,8 @@ export default function AdminPanel(){
   if(!isSupabaseConfigured)return <div className="admin-wrap"><div className="admin-card"><h1>Connect your product database</h1><p>Add your Supabase project URL and anon key to <code>.env.local</code>, then run the SQL setup file included with this project.</p><p>See <code>ADMIN-SETUP.md</code> for the complete setup guide.</p></div></div>;
   if(loading)return <div className="admin-wrap"><p>Loading admin…</p></div>;
   if(!session)return <div className="admin-wrap"><form className="admin-card login-card" onSubmit={login}><div className="admin-kicker">HIGHBROW SHOP / PRIVATE AREA</div><h1>Admin sign in</h1><p>Sign in with the administrator account configured in Supabase.</p>{error&&<div className="admin-alert">{error}</div>}<label>Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="username"/></label><label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required autoComplete="current-password"/></label><button className="admin-primary">Sign in</button><Link href="/" className="admin-back">Back to shop</Link></form></div>;
-  if(!isAdmin)return <div className="admin-wrap"><div className="admin-card"><h1>Admin access required</h1><p>This account is signed in, but it does not have the admin role. Ask the project owner to set <code>app_metadata.role = admin</code> in Supabase.</p><button className="admin-secondary" onClick={logout}>Sign out</button></div></div>;
+  if(adminCheckLoading)return <div className="admin-wrap"><p>Checking administrator access…</p></div>;
+  if(!isAdmin)return <div className="admin-wrap"><div className="admin-card"><h1>Admin access required</h1><p>This account is signed in, but it is not listed as an administrator for this website.</p><button className="admin-secondary" onClick={logout}>Sign out</button></div></div>;
 
   return <div className="admin-wrap"><div className="admin-shell"><aside className="admin-sidebar"><Link href="/" className="admin-brand">H <span>HIGHBROW<br/>SHOP</span></Link><div className="admin-side-label">WORKSPACE</div><div className="admin-side-active"><LayoutDashboard size={17}/> Overview</div><div className="admin-side-active"><PackagePlus size={17}/> Products</div><div className="admin-side-label">WEBSITE</div><Link href="/products" className="admin-side-link">View product catalogue <ExternalLink size={14}/></Link><Link href="/" className="admin-side-link">Public homepage <ExternalLink size={14}/></Link><button className="admin-logout" onClick={logout}><LogOut size={16}/> Sign out</button></aside>
     <section className="admin-main"><div className="admin-top"><div><div className="admin-kicker">PRODUCT MANAGEMENT</div><h1>Products</h1><p>Add, edit and publish products in your catalogue.</p></div><div className="admin-user">{session.user.email}</div></div>
